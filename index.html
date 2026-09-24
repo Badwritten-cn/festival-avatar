@@ -170,6 +170,11 @@ input[type=file]{display:none}
         <button class="frame-chip" data-f="firework"><span class="dot" style="background:linear-gradient(180deg,#1a2c5e,#05081a)"></span><span>烟花</span></button>
         <button class="frame-chip" data-f="xiangyun"><span class="dot" style="background:linear-gradient(180deg,#c9982e,#7a5a10)"></span><span>祥云</span></button>
         <button class="frame-chip" data-f="tuanyuan"><span class="dot" style="background:linear-gradient(180deg,#b3762c,#6e4212)"></span><span>团圆</span></button>
+        <button class="frame-chip" data-f="chanjuan"><span class="dot" style="background:linear-gradient(180deg,#1a3a7a,#0a1838)"></span><span>婵娟</span></button>
+        <button class="frame-chip" data-f="haisy"><span class="dot" style="background:linear-gradient(180deg,#0e3a5c,#071a30)"></span><span>海月</span></button>
+        <button class="frame-chip" data-f="yupan"><span class="dot" style="background:radial-gradient(circle at 50% 30%,#f8ecc9,#2a4d8f)"></span><span>玉盘</span></button>
+        <button class="frame-chip" data-f="wangyue"><span class="dot" style="background:linear-gradient(180deg,#8a5a1a,#4a2c08)"></span><span>望岳</span></button>
+        <button class="frame-chip" data-f="duojiao"><span class="dot" style="background:linear-gradient(180deg,#c8102e,#7a0e0e)"></span><span>多娇</span></button>
       </div>
       <div class="zoomrow">
         <span>缩放</span>
@@ -532,6 +537,39 @@ function mountain(c,cx,cy,s,color,snow){
   c.beginPath();c.moveTo(9,-13);c.lineTo(12.5,-7);c.lineTo(5.5,-7);c.closePath();c.fill();
   c.restore();
 }
+/* 竖排文字（自上而下，用于诗句竖列/落款） */
+function vtext(c,str,x,y,size,color,lh){
+  c.fillStyle=color;c.font=size+'px "Kaiti SC","STKaiti","KaiTi",serif';
+  c.textAlign='center';c.textBaseline='middle';
+  lh=lh||size*1.3;
+  for(var i=0;i<str.length;i++)c.fillText(str[i],x,y+i*lh);
+}
+/* 朱文印章（红底白字，竖排作者/词牌名） */
+function seal(c,x,y,s,chars){
+  c.save();
+  c.fillStyle='#b31226';
+  c.beginPath();
+  if(c.roundRect)c.roundRect(x,y,s,s,5);else c.rect(x,y,s,s);
+  c.fill();
+  c.strokeStyle='rgba(247,241,227,.92)';c.lineWidth=2;c.stroke();
+  c.fillStyle='#f7f1e3';
+  c.font=(s*0.52/Math.max(1,chars.length*0.62))+'px "Kaiti SC","STKaiti","KaiTi",serif';
+  c.textAlign='center';c.textBaseline='middle';
+  for(var i=0;i<chars.length;i++)c.fillText(chars[i],x+s/2,y+s*((i+0.5)/chars.length));
+  c.restore();
+}
+/* 横排诗句铭条（米色绶带 + 朱字 + 出处） */
+function verseBanner(c,line,src){
+  var w=480,h=82,x=C-w/2,y=C+276;
+  c.save();c.shadowColor='rgba(0,0,0,.4)';c.shadowBlur=14;c.shadowOffsetY=4;
+  bannerPath(c,x,y,w,h);c.fillStyle='#f7f1e3';c.fill();c.restore();
+  c.strokeStyle='#c9a24a';c.lineWidth=2;bannerPath(c,x,y,w,h);c.stroke();
+  c.fillStyle='#8a1020';c.font='32px "Kaiti SC","STKaiti","KaiTi",serif';
+  c.textAlign='center';c.textBaseline='middle';
+  c.fillText(line,C,y+32);
+  c.fillStyle='#a3742e';c.font='17px "Kaiti SC","STKaiti","KaiTi",serif';
+  c.fillText('—— '+src,C,y+60);
+}
 
 /* 标准比例五星红旗（30x20 规格，不作变形） */
 function drawFlag(c,x,y,u){
@@ -795,6 +833,107 @@ var FRAMES={
     var dots=[180,0,-113,-67,113,67,90],i;
     for(i=0;i<dots.length;i++){p=ringPos(dots[i]);
       c.fillStyle='rgba(255,236,190,.85)';c.beginPath();c.arc(p[0],p[1],2.4,0,7);c.fill();}
+  },
+  /* 婵娟：靛夜桂兔 + 右侧竖排诗列（苏轼《水调歌头》） */
+  chanjuan:function(c){
+    var g=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    g.addColorStop(0,'#1a3a7a');g.addColorStop(1,'#0a1838');
+    ringPath(c);c.fillStyle=g;c.fill();
+    edgeStroke(c,'rgba(232,198,111,.85)',4,3);
+    moonAt(c,-90,26);
+    osCluster(c,-35);osCluster(c,205);
+    rabbit(c,ringPos(135)[0],ringPos(135)[1],.9);
+    var angs=[-150,-60,160,60],p;
+    for(var i=0;i<angs.length;i++){p=ringPos(angs[i]);
+      c.fillStyle='rgba(244,238,221,.85)';c.beginPath();c.arc(p[0],p[1],2.2,0,7);c.fill();}
+    /* 竖排：诗句单列 + 落款小列（沿环带弧度内） */
+    vtext(c,'但愿人长久千里共婵娟',C+374,C-117,22,'#ffe9b8',26);
+    vtext(c,'苏轼《水调歌头》',C+344,C-63,13,'rgba(244,238,221,.8)',18);
+  },
+  /* 海月：沧海生月 + 顶部横排双句（张九龄《望月怀远》） */
+  haisy:function(c){
+    var g=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    g.addColorStop(0,'#0e3a5c');g.addColorStop(1,'#071a30');
+    ringPath(c);c.fillStyle=g;c.fill();
+    edgeStroke(c,'rgba(214,232,255,.8)',4,3);
+    moonAt(c,-90,24);
+    /* 两侧海浪 */
+    c.strokeStyle='rgba(180,220,255,.75)';c.lineWidth=2.4;c.lineCap='round';
+    [165,195].forEach(function(d){var p=ringPos(d);
+      c.beginPath();c.moveTo(p[0]-16,p[1]+4);c.quadraticCurveTo(p[0]-8,p[1]-4,p[0],p[1]+4);
+      c.quadraticCurveTo(p[0]+8,p[1]+12,p[0]+16,p[1]+4);c.stroke();});
+    [-15,15].forEach(function(d){var p=ringPos(d);
+      c.beginPath();c.moveTo(p[0]-16,p[1]-4);c.quadraticCurveTo(p[0]-8,p[1]-12,p[0],p[1]-4);
+      c.quadraticCurveTo(p[0]+8,p[1]+4,p[0]+16,p[1]-4);c.stroke();});
+    var angs=[-140,-40,140,45],p;
+    for(var i=0;i<angs.length;i++){p=ringPos(angs[i]);
+      c.fillStyle='rgba(244,238,221,.8)';c.beginPath();c.arc(p[0],p[1],2,0,7);c.fill();}
+    /* 顶部横排双句 + 底部落款 */
+    c.textAlign='center';c.textBaseline='middle';
+    c.fillStyle='#ffe9b8';c.font='24px "Kaiti SC","STKaiti","KaiTi",serif';
+    c.fillText('海 上 生 明 月',C,C-376);
+    c.fillText('天 涯 共 此 时',C,C-348);
+    c.fillStyle='rgba(244,238,221,.8)';c.font='15px "Kaiti SC","STKaiti","KaiTi",serif';
+    c.fillText('—— 张九龄《望月怀远》',C,C+363);
+  },
+  /* 玉盘：童趣大月 + 朱印「白玉盘」+ 底部横排诗句（李白《古朗月行》） */
+  yupan:function(c){
+    var g=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    g.addColorStop(0,'#2a4d8f');g.addColorStop(1,'#12295c');
+    ringPath(c);c.fillStyle=g;c.fill();
+    edgeStroke(c,'rgba(255,244,214,.9)',4,3);
+    moonAt(c,-90,30);
+    rabbit(c,ringPos(135)[0],ringPos(135)[1],1);
+    var angs=[-150,-30,30,165,195],p;
+    for(var i=0;i<angs.length;i++){p=ringPos(angs[i]);
+      c.fillStyle=i%2?'rgba(255,217,74,.9)':'rgba(244,238,221,.9)';
+      c.beginPath();c.arc(p[0],p[1],i%2?2.6:2,0,7);c.fill();}
+    /* 右侧朱印 + 底部横排诗句 */
+    seal(c,C+340,C-30,56,'白玉盘');
+    c.textAlign='center';c.textBaseline='middle';
+    c.fillStyle='#ffe9b8';c.font='23px "Kaiti SC","STKaiti","KaiTi",serif';
+    c.fillText('小时不识月 · 呼作白玉盘',C,C+352);
+    c.fillStyle='rgba(244,238,221,.8)';c.font='15px "Kaiti SC","STKaiti","KaiTi",serif';
+    c.fillText('—— 李白《古朗月行》',C,C+380);
+  },
+  /* 望岳：金棕群山 + 左右对联式竖列（杜甫《望岳》） */
+  wangyue:function(c){
+    var g=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    g.addColorStop(0,'#8a5a1a');g.addColorStop(1,'#4a2c08');
+    ringPath(c);c.fillStyle=g;c.fill();
+    edgeStroke(c,'rgba(255,248,230,.9)',5,3);
+    var p=ringPos(-90);
+    c.fillStyle='#ffd94a';c.beginPath();c.arc(p[0],p[1],17,0,7);c.fill();
+    c.strokeStyle='rgba(255,248,230,.5)';c.lineWidth=2;
+    c.beginPath();c.arc(p[0],p[1],23,0,7);c.stroke();
+    p=ringPos(150);mountain(c,p[0],p[1],1.15,'#5f3f0d','#fff7e6');
+    p=ringPos(90);mountain(c,p[0],p[1],1.15,'#5f3f0d','#fff7e6');
+    p=ringPos(30);mountain(c,p[0],p[1],.95,'#6e4a0d','#fff7e6');
+    cloud(c,ringPos(-140)[0],ringPos(-140)[1],1.1,'#fff7e6');
+    cloud(c,ringPos(-40)[0],ringPos(-40)[1],1.1,'#fff7e6');
+    /* 对联式：右出句 左对句 + 底部落款 */
+    vtext(c,'会当凌绝顶',C+372,C-72,24,'#fff7e6',30);
+    vtext(c,'一览众山小',C+342,C-72,24,'#fff7e6',30);
+    c.textAlign='center';c.textBaseline='middle';
+    c.fillStyle='rgba(255,248,230,.85)';c.font='15px "Kaiti SC","STKaiti","KaiTi",serif';
+    c.fillText('—— 杜甫《望岳》',C,C+363);
+  },
+  /* 多娇：赤金江山 + 绶带铭条（毛泽东《沁园春·雪》） */
+  duojiao:function(c){
+    var g=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    g.addColorStop(0,'#c8102e');g.addColorStop(1,'#7a0e0e');
+    ringPath(c);c.fillStyle=g;c.fill();
+    edgeStroke(c,'rgba(243,211,131,.95)',5,3);
+    burst(c,ringPos(-90)[0],ringPos(-90)[1],24,'#ffd94a');
+    var p=ringPos(150);mountain(c,p[0],p[1],1.1,'#8a5a1a','#ffe9b8');
+    p=ringPos(90);mountain(c,p[0],p[1],1.1,'#8a5a1a','#ffe9b8');
+    p=ringPos(30);mountain(c,p[0],p[1],.9,'#9d6a20','#ffe9b8');
+    cloud(c,ringPos(-140)[0],ringPos(-140)[1],1.1,'#ffe9b8');
+    cloud(c,ringPos(-40)[0],ringPos(-40)[1],1.1,'#ffe9b8');
+    var dots=[-165,-115,180],i;
+    for(i=0;i<dots.length;i++){p=ringPos(dots[i]);
+      c.fillStyle='rgba(255,217,74,.85)';c.beginPath();c.arc(p[0],p[1],2.6,0,7);c.fill();}
+    verseBanner(c,'江山如此多娇','毛泽东《沁园春·雪》');
   }
 };
 
