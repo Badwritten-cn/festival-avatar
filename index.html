@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#070d1f">
+<title>月满山河 · 双节头像工坊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#070d1f; --night1:#0b1630; --night2:#14244d; --night3:#1c3f7d;
+  --gold:#e8c66f; --gold-b:#ffd98a; --gold-dim:#a8894a;
+  --red:#c8102e; --red-b:#e8323f; --paper:#f7f1e3;
+  --font-d:'ZCOOL XiaoWei','Songti SC','STSong',serif;
+  --font-b:'Noto Serif SC','Songti SC',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:var(--font-b); color:var(--paper); background:var(--ink);
+  background-image:
+    radial-gradient(ellipse 60% 40% at 85% -5%, rgba(232,198,111,.14), transparent 60%),
+    radial-gradient(ellipse 70% 45% at 10% 108%, rgba(200,16,46,.16), transparent 60%),
+    linear-gradient(175deg,#0a1226 0%, #070d1f 55%, #0a0f22 100%);
+  min-height:100dvh; overflow-x:hidden;
+}
+/* ── 星空 ── */
+.sky{position:fixed;inset:0;pointer-events:none;z-index:0}
+.star{position:absolute;border-radius:50%;background:#fff;animation:tw 3.5s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.15}50%{opacity:.85}}
+.halo-moon{position:fixed;top:-70px;right:-60px;width:260px;height:260px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(255,236,170,.22),rgba(255,236,170,.05) 45%,transparent 70%);z-index:0}
+.halo-red{position:fixed;bottom:-90px;left:-70px;width:300px;height:300px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(232,50,63,.14),transparent 65%);z-index:0}
+/* ── 布局 ── */
+.wrap{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:clamp(18px,4vw,32px) 18px calc(28px + env(safe-area-inset-bottom))}
+header{text-align:center;margin-bottom:20px;animation:rise .8s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.eyebrow{font-size:12px;letter-spacing:.55em;text-indent:.55em;color:var(--gold);opacity:.85;margin-bottom:10px}
+h1{font-family:var(--font-d);font-weight:400;font-size:clamp(34px,9vw,44px);letter-spacing:.14em;text-indent:.14em;line-height:1.15;
+  background:linear-gradient(180deg,#fdf6e0 15%,var(--gold-b) 55%,var(--gold-dim));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 2px 14px rgba(232,198,111,.25))}
+.sub{margin-top:8px;font-size:13.5px;color:rgba(247,241,227,.62);letter-spacing:.12em}
+.dates{display:flex;justify-content:center;gap:10px;margin-top:14px}
+.chip-date{font-size:12px;letter-spacing:.1em;padding:5px 13px;border-radius:999px;border:1px solid}
+.chip-mid{color:#f3e6b8;border-color:rgba(232,198,111,.45);background:rgba(232,198,111,.08)}
+.chip-nat{color:#ffb9b9;border-color:rgba(232,50,63,.5);background:rgba(232,50,63,.1)}
+/* ── 主卡 ── */
+.card{background:linear-gradient(180deg,rgba(20,36,77,.5),rgba(11,22,48,.55));
+  border:1px solid rgba(232,198,111,.22);border-radius:22px;padding:16px;
+  box-shadow:0 24px 60px -24px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  animation:rise .8s .12s ease both}
+.stage{position:relative;width:100%;aspect-ratio:1;border-radius:16px;overflow:hidden;
+  background:radial-gradient(circle at 50% 32%,#152649 0%,#0a142e 70%);
+  border:1px solid rgba(232,198,111,.14)}
+canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+canvas:active{cursor:grabbing}
+/* 上传空态 */
+.dropzone{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  cursor:pointer;transition:background .25s}
+.dropzone:hover,.dropzone.drag{background:rgba(232,198,111,.05)}
+.dz-ring{width:118px;height:118px;border-radius:50%;border:1.5px dashed rgba(232,198,111,.55);
+  display:flex;align-items:center;justify-content:center;animation:breathe 3.2s ease-in-out infinite;position:relative}
+@keyframes breathe{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(232,198,111,.12)}50%{transform:scale(1.045);box-shadow:0 0 40px 4px rgba(232,198,111,.14)}}
+.dz-ring svg{width:52px;height:52px}
+.dz-t1{font-family:var(--font-d);font-size:19px;letter-spacing:.22em;text-indent:.22em;color:var(--gold-b)}
+.dz-t2{font-size:12px;color:rgba(247,241,227,.5);letter-spacing:.08em}
+/* 编辑器控制 */
+.editor{display:none}
+.editor.on{display:block;animation:rise .4s ease both}
+.frames{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0 4px}
+.frames.disabled{opacity:.35;pointer-events:none}
+.style-label{margin:16px 2px 0;font-size:11.5px;letter-spacing:.28em;color:rgba(232,198,111,.75)}
+.frame-chip{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 2px 8px;border-radius:12px;
+  border:1px solid rgba(247,241,227,.12);background:rgba(7,13,31,.4);cursor:pointer;transition:.2s;color:rgba(247,241,227,.75)}
+.frame-chip:active{transform:scale(.96)}
+.frame-chip .dot{width:30px;height:30px;border-radius:50%;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.frame-chip span{font-size:12px;letter-spacing:.12em;text-indent:.12em;font-family:var(--font-d);white-space:nowrap}
+.frame-chip.sel{border-color:var(--gold);background:rgba(232,198,111,.1);color:var(--gold-b);box-shadow:0 0 18px -4px rgba(232,198,111,.35)}
+/* 缩放 */
+.zoomrow{display:flex;align-items:center;gap:12px;margin:10px 2px 4px;color:rgba(247,241,227,.55);font-size:12px;letter-spacing:.1em}
+input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:3px;border-radius:3px;
+  background:linear-gradient(90deg,var(--gold-dim),rgba(232,198,111,.2));outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;cursor:pointer;
+  background:radial-gradient(circle at 35% 30%,#fff3d6,var(--gold) 60%,var(--gold-dim));box-shadow:0 2px 10px rgba(232,198,111,.5);border:none}
+/* 按钮 */
+.actions{display:flex;gap:10px;margin-top:16px}
+.btn{flex:1;font-family:var(--font-d);font-size:17px;letter-spacing:.28em;text-indent:.28em;padding:14px 8px;border-radius:14px;
+  border:1px solid transparent;cursor:pointer;transition:.2s}
+.btn:active{transform:scale(.97)}
+.btn-primary{color:#2b1608;font-weight:600;
+  background:linear-gradient(135deg,#f5d98b,#e8b64f 55%,#d99b3a);
+  box-shadow:0 10px 26px -8px rgba(232,182,79,.55), inset 0 1px 0 rgba(255,255,255,.5)}
+.btn-ghost{color:var(--gold-b);border-color:rgba(232,198,111,.4);background:rgba(232,198,111,.06)}
+.btn-ghost:hover{background:rgba(232,198,111,.13)}
+.hint{margin-top:14px;text-align:center;font-size:11.5px;color:rgba(247,241,227,.4);letter-spacing:.06em;line-height:1.7}
+/* ── 结果弹层 ── */
+.modal{position:fixed;inset:0;z-index:10;display:none;align-items:center;justify-content:center;padding:22px;
+  background:rgba(4,8,20,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.modal.on{display:flex;animation:fade .3s ease both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal-box{width:min(420px,100%);text-align:center;animation:rise .35s ease both}
+.modal-box img{width:100%;border-radius:18px;box-shadow:0 30px 70px -20px rgba(0,0,0,.9),0 0 0 1px rgba(232,198,111,.25)}
+.modal-t{font-family:var(--font-d);font-size:20px;letter-spacing:.24em;text-indent:.24em;color:var(--gold-b);margin-bottom:14px}
+.modal-hint{font-size:12.5px;color:rgba(247,241,227,.55);margin-top:12px;line-height:1.8}
+.modal-actions{display:flex;gap:10px;margin-top:16px}
+footer{margin-top:26px;text-align:center;font-size:11.5px;color:rgba(247,241,227,.35);letter-spacing:.12em;line-height:2}
+footer b{color:rgba(232,198,111,.55);font-weight:400}
+input[type=file]{display:none}
+</style>
+</head>
+<body>
+<div class="sky" id="sky"></div>
+<div class="halo-moon"></div>
+<div class="halo-red"></div>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">MID-AUTUMN × NATIONAL DAY</div>
+    <h1>月满山河</h1>
+    <div class="sub">双节头像工坊 · 一张照片，两种团圆</div>
+    <div class="dates">
+      <span class="chip-date chip-mid">中秋 · 09.25</span>
+      <span class="chip-date chip-nat">国庆 · 10.01</span>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="stage" id="stage">
+      <canvas id="cv" width="800" height="800"></canvas>
+      <div class="dropzone" id="dz">
+        <div class="dz-ring">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="4.2" fill="#f8ecc9" opacity=".9"/>
+            <path d="M12 5.6a6.4 6.4 0 1 0 6.4 6.4" stroke="#e8c66f" stroke-width="1.2" stroke-linecap="round" opacity=".9"/>
+            <circle cx="18.8" cy="7" r=".9" fill="#ffd98a"/><circle cx="4.6" cy="15.5" r=".7" fill="#ffd98a"/><circle cx="7" cy="4.4" r=".6" fill="#ffd98a"/>
+          </svg>
+        </div>
+        <div class="dz-t1">换上双节头像</div>
+        <div class="dz-t2">点击上传照片，或拖入此处</div>
+      </div>
+    </div>
+
+    <div class="editor" id="editor">
+      <div class="style-label">样式模板</div>
+      <div class="frames" id="styles">
+        <button class="frame-chip sel" data-s="ring"><span class="dot" style="background:linear-gradient(135deg,#e8c66f,#c8102e 55%,#1e4285)"></span><span>圆框</span></button>
+        <button class="frame-chip" data-s="flag"><span class="dot" style="background:linear-gradient(180deg,#de2910 62%,#ffde00 62%)"></span><span>国旗渐隐</span></button>
+        <button class="frame-chip" data-s="lantern"><span class="dot" style="background:radial-gradient(circle at 50% 40%,#e8323f,#5e0715)"></span><span>灯笼</span></button>
+        <button class="frame-chip" data-s="moon"><span class="dot" style="background:radial-gradient(circle at 50% 35%,#2a4d8f,#050a1c)"></span><span>圆月夜</span></button>
+        <button class="frame-chip" data-s="stamp"><span class="dot" style="background:linear-gradient(180deg,#f7f1e3,#d9c9a3)"></span><span>邮票</span></button>
+        <button class="frame-chip" data-s="badge"><span class="dot" style="background:radial-gradient(circle at 50% 35%,#ffd94a,#c8102e 72%)"></span><span>徽章</span></button>
+        <button class="frame-chip" data-s="sticker"><span class="dot" style="background:radial-gradient(circle at 50% 40%,#fdfaf2,#e8c66f)"></span><span>贴纸</span></button>
+      </div>
+      <div class="style-label">圆框边框</div>
+      <div class="frames" id="frames">
+        <button class="frame-chip sel" data-f="national"><span class="dot" style="background:linear-gradient(180deg,#e8323f,#a30d24)"></span><span>国庆</span></button>
+        <button class="frame-chip" data-f="mid"><span class="dot" style="background:radial-gradient(circle at 50% 30%,#1e4285,#0c1c40)"></span><span>中秋</span></button>
+        <button class="frame-chip" data-f="duo"><span class="dot" style="background:linear-gradient(90deg,#c8102e 50%,#0e2148 50%)"></span><span>双节</span></button>
+        <button class="frame-chip" data-f="yueqi"><span class="dot" style="background:linear-gradient(90deg,#0e2148 50%,#c8102e 50%)"></span><span>月旗</span></button>
+        <button class="frame-chip" data-f="rabbit"><span class="dot" style="background:radial-gradient(circle at 50% 30%,#2a4d8f,#0a1838)"></span><span>玉兔</span></button>
+        <button class="frame-chip" data-f="mooncake"><span class="dot" style="background:linear-gradient(180deg,#c98a3e,#7a4a1a)"></span><span>月饼</span></button>
+        <button class="frame-chip" data-f="guihua"><span class="dot" style="background:linear-gradient(180deg,#a3742e,#5f3f0d)"></span><span>桂花</span></button>
+        <button class="frame-chip" data-f="kongming"><span class="dot" style="background:linear-gradient(180deg,#12295c,#060d20)"></span><span>孔明灯</span></button>
+        <button class="frame-chip" data-f="shanhe"><span class="dot" style="background:linear-gradient(180deg,#d4a13c,#8a5a1a)"></span><span>山河</span></button>
+        <button class="frame-chip" data-f="lantern"><span class="dot" style="background:linear-gradient(180deg,#c8102e,#5e0715)"></span><span>灯笼</span></button>
+        <button class="frame-chip" data-f="firework"><span class="dot" style="background:linear-gradient(180deg,#1a2c5e,#05081a)"></span><span>烟花</span></button>
+        <button class="frame-chip" data-f="xiangyun"><span class="dot" style="background:linear-gradient(180deg,#c9982e,#7a5a10)"></span><span>祥云</span></button>
+        <button class="frame-chip" data-f="tuanyuan"><span class="dot" style="background:linear-gradient(180deg,#b3762c,#6e4212)"></span><span>团圆</span></button>
+      </div>
+      <div class="zoomrow">
+        <span>缩放</span>
+        <input type="range" id="zoom" min="1" max="3" step="0.01" value="1">
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost" id="btnChange">换一张</button>
+        <button class="btn btn-primary" id="btnGen">生成头像</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">全部处理在本机完成，照片不会上传到任何服务器<br>生成后长按图片即可保存转发</div>
+
+  <footer>月满山河 · <b>中秋 × 国庆</b> 双节头像工坊</footer>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-t">头像已生成</div>
+    <img id="resultImg" alt="生成的双节头像">
+    <div class="modal-hint">手机端：长按上方图片保存到相册<br>电脑端：点击下方按钮下载</div>
+    <div class="modal-actions">
+      <a class="btn btn-primary" id="btnDl" download="双节头像-月满山河.png">下载头像</a>
+      <button class="btn btn-ghost" id="btnAgain">继续编辑</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="file" accept="image/*">
+
+<script>
+/* ─────────── 星空背景 ─────────── */
+(function(){
+  var sky=document.getElementById('sky');
+  for(var i=0;i<70;i++){
+    var s=document.createElement('div');s.className='star';
+    var z=Math.random()<.75?1:2;
+    s.style.cssText='left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;width:'+z+'px;height:'+z+'px;animation-delay:'+(Math.random()*3.5)+'s;animation-duration:'+(2.5+Math.random()*3)+'s';
+    sky.appendChild(s);
+  }
+})();
+
+/* ─────────── 画布与状态 ─────────── */
+var S=800, C=400, R_IN=330, R_OUT=396, R_MID=(R_IN+R_OUT)/2;
+var cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+var img=null, frame='national', style='ring', zoom=1, ox=0, oy=0, base=1;
+var dz=document.getElementById('dz'), editor=document.getElementById('editor'), fileInput=document.getElementById('file');
+
+function loadFile(f){
+  if(!f||!f.type||f.type.indexOf('image')!==0)return;
+  var url=URL.createObjectURL(f);
+  var im=new Image();
+  im.onload=function(){ img=im; base=Math.max(2*R_IN/im.naturalWidth,2*R_IN/im.naturalHeight); zoom=1;ox=0;oy=0;
+    document.getElementById('zoom').value=1; dz.style.display='none'; editor.classList.add('on'); render(); };
+  im.src=url;
+}
+function loadDemo(){
+  var im=new Image();
+  im.onload=function(){ img=im; base=Math.max(2*R_IN/im.naturalWidth,2*R_IN/im.naturalHeight); zoom=1;ox=0;oy=0;
+    dz.style.display='none'; editor.classList.add('on'); render(); };
+  var oc=document.createElement('canvas');oc.width=oc.height=700;var c=oc.getContext('2d');
+  var g=c.createLinearGradient(0,0,700,700);g.addColorStop(0,'#7f9bb8');g.addColorStop(.5,'#5c7ea3');g.addColorStop(1,'#41597a');
+  c.fillStyle=g;c.fillRect(0,0,700,700);
+  c.fillStyle='rgba(255,255,255,.85)';c.beginPath();c.arc(350,300,105,0,7);c.fill();
+  c.beginPath();c.arc(350,560,180,Math.PI,0);c.fill();
+  im.src=oc.toDataURL();
+}
+function clampOff(){
+  var s=base*zoom, w=img.naturalWidth*s/2, h=img.naturalHeight*s/2;
+  ox = w>R_IN ? Math.max(Math.min(ox, w-R_IN), R_IN-w) : 0;
+  oy = h>R_IN ? Math.max(Math.min(oy, h-R_IN), R_IN-h) : 0;
+}
+function photoCircle(r){
+  if(!img)return;
+  ctx.save();ctx.beginPath();ctx.arc(C,C,r,0,7);ctx.clip();
+  var s=base*zoom,iw=img.naturalWidth*s,ih=img.naturalHeight*s;
+  ctx.drawImage(img,C-iw/2+ox,C-ih/2+oy,iw,ih);
+  ctx.restore();
+}
+function render(){
+  ctx.clearRect(0,0,S,S);
+  if(style==='ring'){
+    if(img){
+      clampOff();
+      ctx.save();ctx.beginPath();ctx.arc(C,C,R_IN,0,7);ctx.clip();
+      var s=base*zoom,iw=img.naturalWidth*s,ih=img.naturalHeight*s;
+      ctx.drawImage(img,C-iw/2+ox,C-ih/2+oy,iw,ih);
+      var vg=ctx.createRadialGradient(C,C,R_IN*.55,C,C,R_IN);
+      vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(7,10,25,.3)');
+      ctx.fillStyle=vg;ctx.fillRect(0,0,S,S);
+      ctx.restore();
+    }
+    FRAMES[frame](ctx);
+    return;
+  }
+  TEMPLATES[style](ctx);
+}
+
+/* ─────────── 样式模板 ─────────── */
+function bannerPath(c,x,y,w,h){
+  var n=18;
+  c.beginPath();
+  c.moveTo(x,y);c.lineTo(x+w,y);c.lineTo(x+w-n,y+h/2);c.lineTo(x+w,y+h);
+  c.lineTo(x,y+h);c.lineTo(x+n,y+h/2);c.closePath();
+}
+var TEMPLATES={
+  /* 国旗渐隐：整面标准国旗半透明覆盖（国旗原样） */
+  flag:function(){
+    photoCircle(380);
+    ctx.save();ctx.beginPath();ctx.arc(C,C,380,0,7);ctx.clip();
+    ctx.globalAlpha=.55;
+    drawFlag(ctx,C-380,C-253,50.67);
+    ctx.globalAlpha=1;
+    ctx.restore();
+    edgeStroke(ctx,'rgba(243,211,131,.95)',5,3);
+  },
+  /* 灯笼：照片裁成灯笼形 */
+  lantern:function(){
+    var gl=ctx.createRadialGradient(C,C,140,C,C,400);
+    gl.addColorStop(0,'rgba(232,50,63,.22)');gl.addColorStop(1,'rgba(232,50,63,0)');
+    ctx.fillStyle=gl;ctx.fillRect(0,0,S,S);
+    ctx.strokeStyle='#f3d383';ctx.lineWidth=4;
+    ctx.beginPath();ctx.moveTo(C,26);ctx.lineTo(C,104);ctx.stroke();
+    if(img){ctx.save();ctx.beginPath();ctx.ellipse(C,C,285,255,0,0,7);ctx.clip();
+      var s=base*zoom,iw=img.naturalWidth*s,ih=img.naturalHeight*s;
+      ctx.drawImage(img,C-iw/2+ox,C-ih/2+oy,iw,ih);ctx.restore();}
+    ctx.strokeStyle='rgba(232,50,63,.4)';ctx.lineWidth=3;
+    ctx.beginPath();ctx.ellipse(C,C,180,255,0,0,7);ctx.stroke();
+    ctx.beginPath();ctx.ellipse(C,C,90,255,0,0,7);ctx.stroke();
+    ctx.strokeStyle='#f3d383';ctx.lineWidth=6;
+    ctx.beginPath();ctx.ellipse(C,C,285,255,0,0,7);ctx.stroke();
+    ctx.fillStyle='#f3d383';
+    ctx.beginPath();ctx.moveTo(C-84,100);ctx.lineTo(C+84,100);ctx.lineTo(C+64,148);ctx.lineTo(C-64,148);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(C-64,652);ctx.lineTo(C+64,652);ctx.lineTo(C+84,700);ctx.lineTo(C-84,700);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#ffd94a';ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(C,700);ctx.lineTo(C,724);ctx.stroke();
+    ctx.strokeStyle='#e8323f';ctx.lineWidth=4;
+    [-10,0,10].forEach(function(dx){
+      ctx.beginPath();ctx.moveTo(C,724);ctx.quadraticCurveTo(C+dx,758,C+dx*1.4,788);ctx.stroke();});
+  },
+  /* 圆月夜：整幅夜空 + 照片变满月 */
+  moon:function(){
+    var g=ctx.createLinearGradient(0,0,0,S);
+    g.addColorStop(0,'#0e2050');g.addColorStop(1,'#04071a');
+    ctx.fillStyle=g;ctx.fillRect(0,0,S,S);
+    for(var i=0;i<46;i++){
+      var sx=(i*173+57)%800, sy=(i*97+31)%800;
+      if(Math.hypot(sx-C,sy-C)<340)continue;
+      ctx.fillStyle='rgba(244,238,221,'+(.25+((i*7)%50)/100)+')';
+      ctx.beginPath();ctx.arc(sx,sy,i%3?1.6:2.6,0,7);ctx.fill();
+    }
+    var halo=ctx.createRadialGradient(C,C,300,C,C,392);
+    halo.addColorStop(0,'rgba(255,238,178,.4)');halo.addColorStop(1,'rgba(255,238,178,0)');
+    ctx.fillStyle=halo;ctx.beginPath();ctx.arc(C,C,392,0,7);ctx.fill();
+    photoCircle(310);
+    ctx.fillStyle='rgba(214,196,150,.35)';
+    [[C-215,C-185,22],[C+205,C-195,19],[C+230,C+130,26],[C-235,C+150,21],[C+90,C+262,16]].forEach(function(k){
+      ctx.beginPath();ctx.arc(k[0],k[1],k[2],0,7);ctx.fill();});
+    ctx.strokeStyle='rgba(243,211,131,.6)';ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(C,C,312,0,7);ctx.stroke();
+    rabbit(ctx,C-6,C+252,.9);
+  },
+  /* 邮票：齿孔卡片 + 铭条 */
+  stamp:function(){
+    ctx.save();
+    ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=30;ctx.shadowOffsetY=10;
+    ctx.fillStyle='#f7f1e3';
+    ctx.beginPath();
+    if(ctx.roundRect)ctx.roundRect(70,70,660,660,10);else ctx.rect(70,70,660,660);
+    ctx.fill();ctx.restore();
+    ctx.globalCompositeOperation='destination-out';
+    for(var i=0;i<=15;i++){
+      var p=70+i*44;
+      [[p,70],[p,730],[70,p],[730,p]].forEach(function(pt){
+        ctx.beginPath();ctx.arc(pt[0],pt[1],13,0,7);ctx.fill();});
+    }
+    ctx.globalCompositeOperation='source-over';
+    if(img){ctx.save();ctx.beginPath();ctx.rect(126,116,548,500);ctx.clip();
+      var s=base*zoom,iw=img.naturalWidth*s,ih=img.naturalHeight*s;
+      ctx.drawImage(img,C-iw/2+ox,C-ih/2+oy,iw,ih);ctx.restore();}
+    ctx.strokeStyle='#c9b68a';ctx.lineWidth=2;ctx.strokeRect(122,112,556,508);
+    ctx.fillStyle='#8a5a24';
+    ctx.font='40px "ZCOOL XiaoWei","Songti SC",serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('月满山河 · 双节同庆',C,674);
+    drawFlag(ctx,150,660,2.6);
+    ctx.fillStyle='#d8a844';ctx.beginPath();ctx.arc(636,674,16,0,7);ctx.fill();
+    ctx.fillStyle='#f7f1e3';ctx.beginPath();ctx.arc(630,668,13,0,7);ctx.fill();
+  },
+  /* 徽章：头像徽章 + 绶带 */
+  badge:function(){
+    ctx.fillStyle='#a30d24';
+    ctx.save();ctx.translate(C-160,C+260);ctx.rotate(-.35);ctx.fillRect(-26,0,52,150);ctx.restore();
+    ctx.save();ctx.translate(C+160,C+260);ctx.rotate(.35);ctx.fillRect(-26,0,52,150);ctx.restore();
+    photoCircle(270);
+    ctx.strokeStyle='#f3d383';ctx.lineWidth=8;
+    ctx.beginPath();ctx.arc(C,C,284,0,7);ctx.stroke();
+    ctx.strokeStyle='rgba(243,211,131,.5)';ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(C,C,302,0,7);ctx.stroke();
+    bannerPath(ctx,C-210,C+236,420,88);
+    ctx.fillStyle='#c8102e';ctx.fill();
+    ctx.strokeStyle='#f3d383';ctx.lineWidth=3;ctx.stroke();
+    ctx.fillStyle='#ffd94a';
+    ctx.font='54px "ZCOOL XiaoWei","Songti SC",serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('双节同庆',C,C+280);
+    star(ctx,C,C-318,26,0,'#ffd94a');
+    star(ctx,C-330,C-258,14,0,'#ffd94a');
+    star(ctx,C+330,C-258,14,0,'#ffd94a');
+  },
+  /* 贴纸：白边贴纸 + 散贴元素 */
+  sticker:function(){
+    ctx.save();
+    ctx.shadowColor='rgba(0,0,0,.3)';ctx.shadowBlur=24;ctx.shadowOffsetY=8;
+    ctx.fillStyle='#fdfaf2';ctx.beginPath();ctx.arc(C,C,262,0,7);ctx.fill();
+    ctx.restore();
+    photoCircle(240);
+    ctx.strokeStyle='rgba(0,0,0,.06)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(C,C,262,0,7);ctx.stroke();
+    lantern(ctx,150,170,1.25);
+    var mg=ctx.createRadialGradient(640,160,10,640,160,100);
+    mg.addColorStop(0,'rgba(255,238,178,.5)');mg.addColorStop(1,'rgba(255,238,178,0)');
+    ctx.fillStyle=mg;ctx.beginPath();ctx.arc(640,160,100,0,7);ctx.fill();
+    ctx.fillStyle='#f8ecc9';ctx.beginPath();ctx.arc(640,160,48,0,7);ctx.fill();
+    ctx.fillStyle='rgba(226,207,150,.8)';
+    ctx.beginPath();ctx.arc(628,152,8,0,7);ctx.fill();
+    ctx.beginPath();ctx.arc(652,170,6,0,7);ctx.fill();
+    ctx.strokeStyle='#f3d383';ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(120,520);ctx.lineTo(120,650);ctx.stroke();
+    ctx.fillStyle='#ffd94a';ctx.beginPath();ctx.arc(120,516,4,0,7);ctx.fill();
+    drawFlag(ctx,123,520,4);
+    rabbit(ctx,650,610,1.4);
+    flower(ctx,700,340,10,'#ffd98a','#e8a33d');
+    flower(ctx,105,340,9,'#ffd98a','#e8a33d');
+    star(ctx,720,470,12,0,'#ffd94a');
+    star(ctx,90,480,12,0,'#ffd94a');
+  }
+};
+
+/* ─────────── 边框绘制 ─────────── */
+function ringPath(c){c.beginPath();c.arc(C,C,R_OUT,0,7);c.arc(C,C,R_IN,0,7,true);}
+function star(c,cx,cy,r,rot,color){
+  c.beginPath();
+  for(var i=0;i<5;i++){
+    var a=rot-Math.PI/2+i*2*Math.PI/5;
+    var bx=cx+Math.cos(a)*r,by=cy+Math.sin(a)*r;
+    if(i===0)c.moveTo(bx,by);else c.lineTo(bx,by);
+    var a2=a+Math.PI/5;
+    c.lineTo(cx+Math.cos(a2)*r*.382,cy+Math.sin(a2)*r*.382);
+  }
+  c.closePath();c.fillStyle=color;c.fill();
+}
+function ringPos(deg){var a=deg*Math.PI/180;return [C+Math.cos(a)*R_MID, C+Math.sin(a)*R_MID];}
+function edgeStroke(c,color,wOut,wIn){
+  c.beginPath();c.arc(C,C,R_OUT-wOut/2+.5,0,7);c.lineWidth=wOut;c.strokeStyle=color;c.stroke();
+  c.beginPath();c.arc(C,C,R_IN+wIn/2-.5,0,7);c.lineWidth=wIn;c.strokeStyle=color;c.stroke();
+}
+/* 金色烟花 */
+function burst(c,cx,cy,r,color){
+  c.strokeStyle=color;c.fillStyle=color;c.lineWidth=2.2;c.lineCap='round';
+  for(var i=0;i<8;i++){
+    var a=i*Math.PI/4+Math.PI/8;
+    var x2=cx+Math.cos(a)*r,y2=cy+Math.sin(a)*r;
+    c.beginPath();c.moveTo(cx+Math.cos(a)*r*.35,cy+Math.sin(a)*r*.35);c.lineTo(x2,y2);c.stroke();
+    c.beginPath();c.arc(x2,y2,2.4,0,7);c.fill();
+  }
+  c.beginPath();c.arc(cx,cy,3,0,7);c.fill();
+}
+/* 金色红灯笼 */
+function lantern(c,cx,cy,s){
+  s=s||1;
+  c.save();c.translate(cx,cy);c.scale(s,s);
+  c.strokeStyle='#f3d383';c.lineWidth=2;
+  c.beginPath();c.moveTo(0,-25);c.lineTo(0,-17);c.stroke();
+  c.fillStyle='#f3d383';c.fillRect(-6,-20,12,4);
+  var bg=c.createRadialGradient(-3,-9,2,0,-1,17);
+  bg.addColorStop(0,'#ffe08a');bg.addColorStop(.55,'#e8323f');bg.addColorStop(1,'#b30e26');
+  c.fillStyle=bg;c.beginPath();c.ellipse(0,-2,13,11,0,0,7);c.fill();
+  c.strokeStyle='rgba(255,232,168,.5)';c.lineWidth=1;
+  c.beginPath();c.ellipse(0,-2,6.5,11,0,0,7);c.stroke();
+  c.fillStyle='#f3d383';c.fillRect(-6,7,12,3.5);
+  c.strokeStyle='#ffd94a';c.lineWidth=1.8;
+  c.beginPath();c.moveTo(0,10.5);c.lineTo(0,20);c.stroke();
+  c.restore();
+}
+/* 玉兔（可缩放） */
+function rabbit(c,cx,cy,s){
+  c.save();c.translate(cx,cy);c.scale(s,s);
+  c.fillStyle='#f4eedd';
+  c.beginPath();c.arc(-9,9,19,0,7);c.fill();
+  c.beginPath();c.arc(8,-6,12.5,0,7);c.fill();
+  c.save();c.translate(2,-22);c.rotate(-.22);c.beginPath();c.ellipse(0,0,4.6,13.5,0,0,7);c.fill();c.restore();
+  c.save();c.translate(14,-19);c.rotate(.18);c.beginPath();c.ellipse(0,0,4.4,12.5,0,0,7);c.fill();c.restore();
+  c.restore();
+}
+/* 满月（带光晕与环形山） */
+function moonAt(c,deg,r){
+  var p=ringPos(deg);
+  var halo=c.createRadialGradient(p[0],p[1],4,p[0],p[1],r*1.9);
+  halo.addColorStop(0,'rgba(255,238,178,.5)');halo.addColorStop(1,'rgba(255,238,178,0)');
+  c.fillStyle=halo;c.beginPath();c.arc(p[0],p[1],r*1.9,0,7);c.fill();
+  c.fillStyle='#f8ecc9';c.beginPath();c.arc(p[0],p[1],r,0,7);c.fill();
+  c.fillStyle='rgba(226,207,150,.8)';
+  c.beginPath();c.arc(p[0]-r*.3,p[1]-r*.18,r*.17,0,7);c.fill();
+  c.beginPath();c.arc(p[0]+r*.26,p[1]+r*.24,r*.12,0,7);c.fill();
+  return p;
+}
+/* 五瓣小花 */
+function flower(c,cx,cy,r,color,center){
+  for(var i=0;i<5;i++){var a=i*2*Math.PI/5-Math.PI/2;
+    c.fillStyle=color;c.beginPath();c.arc(cx+Math.cos(a)*r*.62,cy+Math.sin(a)*r*.62,r*.42,0,7);c.fill();}
+  c.fillStyle=center;c.beginPath();c.arc(cx,cy,r*.3,0,7);c.fill();
+}
+/* 桂花小簇 */
+function osCluster(c,deg){
+  var p=ringPos(deg);
+  flower(c,p[0]-8,p[1]-6,7,'#ffd98a','#e8a33d');
+  flower(c,p[0]+8,p[1]+2,6,'#ffd98a','#e8a33d');
+  flower(c,p[0]-2,p[1]+8,5,'#ffe9b8','#e8a33d');
+}
+/* 月饼 */
+function mooncake(c,cx,cy,R){
+  c.fillStyle='#d99a45';
+  for(var i=0;i<12;i++){var a=i*2*Math.PI/12;
+    c.beginPath();c.arc(cx+Math.cos(a)*R*.78,cy+Math.sin(a)*R*.78,R*.32,0,7);c.fill();}
+  c.beginPath();c.arc(cx,cy,R*.82,0,7);c.fill();
+  c.strokeStyle='rgba(90,55,14,.85)';c.lineWidth=1.6;
+  c.beginPath();c.arc(cx,cy,R*.6,0,7);c.stroke();
+  flower(c,cx,cy,R*.42,'#b3762c','#8a5a24');
+}
+/* 孔明灯 */
+function skylantern(c,cx,cy,s){
+  c.save();c.translate(cx,cy);c.scale(s,s);
+  var g=c.createRadialGradient(0,0,2,0,0,16);
+  g.addColorStop(0,'rgba(255,190,110,.8)');g.addColorStop(1,'rgba(255,190,110,0)');
+  c.fillStyle=g;c.beginPath();c.arc(0,0,16,0,7);c.fill();
+  c.fillStyle='#ffb35c';
+  c.beginPath();c.moveTo(-6,-8);c.quadraticCurveTo(0,-11,6,-8);c.lineTo(7.5,7);c.quadraticCurveTo(0,10,-7.5,7);c.closePath();c.fill();
+  c.fillStyle='#ff8a3d';c.beginPath();c.ellipse(0,-1,4,5.5,0,0,7);c.fill();
+  c.restore();
+}
+/* 祥云 */
+function cloud(c,cx,cy,s,color){
+  c.save();c.translate(cx,cy);c.scale(s,s);
+  c.strokeStyle=color;c.lineWidth=2;c.lineCap='round';
+  c.beginPath();c.arc(-9,1,5.5,Math.PI*.5,Math.PI*1.9);c.stroke();
+  c.beginPath();c.arc(0,-4,6.5,Math.PI*.6,Math.PI*2.4);c.stroke();
+  c.beginPath();c.arc(9,1,5.5,Math.PI*1.1,Math.PI*2.5);c.stroke();
+  c.beginPath();c.moveTo(-14,6);c.quadraticCurveTo(0,11,14,6);c.stroke();
+  c.restore();
+}
+/* 山峰（带雪顶） */
+function mountain(c,cx,cy,s,color,snow){
+  c.save();c.translate(cx,cy);c.scale(s,s);
+  c.fillStyle=color;
+  c.beginPath();c.moveTo(-17,11);c.lineTo(-5,-10);c.lineTo(1,-2);c.lineTo(9,-13);c.lineTo(17,11);c.closePath();c.fill();
+  c.fillStyle=snow;
+  c.beginPath();c.moveTo(-5,-10);c.lineTo(-2,-4);c.lineTo(-8,-4);c.closePath();c.fill();
+  c.beginPath();c.moveTo(9,-13);c.lineTo(12.5,-7);c.lineTo(5.5,-7);c.closePath();c.fill();
+  c.restore();
+}
+
+/* 标准比例五星红旗（30x20 规格，不作变形） */
+function drawFlag(c,x,y,u){
+  var bigX=x+5*u,bigY=y+5*u;
+  c.fillStyle='#DE2910';c.fillRect(x,y,15*u,10*u);
+  star(c,bigX,bigY,3*u,0,'#FFDE00');
+  var smalls=[[10,2],[12,4],[12,7],[10,9]];
+  for(var i=0;i<4;i++){
+    var sx=x+smalls[i][0]*u,sy=y+smalls[i][1]*u;
+    var ang=Math.atan2(bigY-sy,bigX-sx);
+    star(c,sx,sy,u,ang+Math.PI/2,'#FFDE00');
+  }
+}
+
+var FRAMES={
+  /* 国庆：朱红鎏金环 + 烟花灯笼（不含国旗元素） */
+  national:function(c){
+    var g=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    g.addColorStop(0,'#e8323f');g.addColorStop(.5,'#c8102e');g.addColorStop(1,'#9d0c22');
+    ringPath(c);c.fillStyle=g;c.fill();
+    edgeStroke(c,'rgba(243,211,131,.95)',5,3);
+    c.beginPath();c.arc(C,C,R_MID,0,7);c.lineWidth=1.2;c.strokeStyle='rgba(243,211,131,.3)';c.stroke();
+    var p1=ringPos(-135);burst(c,p1[0],p1[1],26,'#ffd94a');
+    var p2=ringPos(-45);burst(c,p2[0],p2[1],26,'#ffd94a');
+    var tp=ringPos(-90);
+    c.save();c.translate(tp[0],tp[1]);c.rotate(Math.PI/4);
+    c.fillStyle='#f3d383';c.fillRect(-6,-6,12,12);c.restore();
+    lantern(c,ringPos(135)[0],ringPos(135)[1]);
+    lantern(c,ringPos(45)[0],ringPos(45)[1]);
+    /* 底部正中：旗杆 + 小国旗 */
+    var poleX=C+2,pyTop=C+R_MID-24,pyBase=C+R_MID+30;
+    c.strokeStyle='#f3d383';c.lineWidth=2.5;
+    c.beginPath();c.moveTo(poleX,pyTop);c.lineTo(poleX,pyBase);c.stroke();
+    c.fillStyle='#ffd94a';c.beginPath();c.arc(poleX,pyTop-3,3,0,7);c.fill();
+    drawFlag(c,poleX+1.5,pyTop,3);
+    var dots=[-165,-115,15,65,180],p;
+    for(var i=0;i<dots.length;i++){p=ringPos(dots[i]);
+      c.fillStyle='rgba(255,217,74,.85)';c.beginPath();c.arc(p[0],p[1],2.6,0,7);c.fill();}
+  },
+  /* 中秋：靛夜环 + 满月玉兔 */
+  mid:function(c){
+    var g=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    g.addColorStop(0,'#16306b');g.addColorStop(.55,'#0f224f');g.addColorStop(1,'#0a1838');
+    ringPath(c);c.fillStyle=g;c.fill();
+    var neb=c.createRadialGradient(C,C-R_MID,10,C,C-R_MID,90);
+    neb.addColorStop(0,'rgba(120,160,255,.28)');neb.addColorStop(1,'rgba(120,160,255,0)');
+    c.save();ringPath(c);c.clip();c.fillStyle=neb;c.fillRect(0,0,S,S);c.restore();
+    edgeStroke(c,'rgba(232,198,111,.85)',4,3);
+    var mp=ringPos(-90);
+    var halo=c.createRadialGradient(mp[0],mp[1],6,mp[0],mp[1],52);
+    halo.addColorStop(0,'rgba(255,238,178,.55)');halo.addColorStop(1,'rgba(255,238,178,0)');
+    c.fillStyle=halo;c.beginPath();c.arc(mp[0],mp[1],52,0,7);c.fill();
+    c.fillStyle='#f8ecc9';c.beginPath();c.arc(mp[0],mp[1],27,0,7);c.fill();
+    c.fillStyle='rgba(226,207,150,.8)';
+    c.beginPath();c.arc(mp[0]-8,mp[1]-5,5,0,7);c.fill();
+    c.beginPath();c.arc(mp[0]+7,mp[1]+7,3.6,0,7);c.fill();
+    c.beginPath();c.arc(mp[0]+11,mp[1]-9,2.6,0,7);c.fill();
+    var rp=ringPos(90);
+    rabbit(c,rp[0],rp[1],1);
+    var angs=[-140,-52,-25,24,140,166],p;
+    for(var i=0;i<angs.length;i++){p=ringPos(angs[i]);
+      c.fillStyle=i%2?'rgba(244,238,221,.9)':'rgba(255,217,138,.9)';
+      c.beginPath();c.arc(p[0],p[1],i%2?2.2:2.8,0,7);c.fill();}
+  },
+  /* 双节：左烟花灯笼 右满月星子 */
+  duo:function(c){
+    var gr=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    gr.addColorStop(0,'#e8323f');gr.addColorStop(1,'#9d0c22');
+    var gn=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    gn.addColorStop(0,'#1b3a78');gn.addColorStop(1,'#0a1838');
+    c.save();c.beginPath();c.rect(0,0,C,S);c.clip();ringPath(c);c.fillStyle=gr;c.fill();c.restore();
+    c.save();c.beginPath();c.rect(C,0,C,S);c.clip();ringPath(c);c.fillStyle=gn;c.fill();c.restore();
+    c.strokeStyle='rgba(243,211,131,.95)';c.lineWidth=4;
+    c.beginPath();c.moveTo(C,C-R_OUT);c.lineTo(C,C-R_IN);c.stroke();
+    c.beginPath();c.moveTo(C,C+R_IN);c.lineTo(C,C+R_OUT);c.stroke();
+    edgeStroke(c,'rgba(243,211,131,.95)',5,3);
+    var p=ringPos(-143);burst(c,p[0],p[1],22,'#ffd94a');
+    lantern(c,ringPos(143)[0],ringPos(143)[1]);
+    var dots=[-115,-180,-64,-10,12,64,116,152];
+    for(var i=0;i<dots.length;i++){p=ringPos(dots[i]);
+      c.fillStyle=i%2?'rgba(255,217,74,.85)':'rgba(244,238,221,.85)';
+      c.beginPath();c.arc(p[0],p[1],2.5,0,7);c.fill();}
+    var tp=ringPos(-90);
+    c.save();c.translate(tp[0],tp[1]);c.rotate(Math.PI/4);
+    c.fillStyle='#f3d383';c.fillRect(-7,-7,14,14);c.restore();
+    var bp=ringPos(90);
+    c.save();c.translate(bp[0],bp[1]);c.rotate(Math.PI/4);
+    c.fillStyle='#f3d383';c.fillRect(-7,-7,14,14);c.restore();
+  },
+  /* 玉兔：大月大兔 */
+  rabbit:function(c){
+    var g=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    g.addColorStop(0,'#123064');g.addColorStop(1,'#081230');
+    ringPath(c);c.fillStyle=g;c.fill();
+    edgeStroke(c,'rgba(207,225,255,.75)',4,3);
+    moonAt(c,-90,28);
+    rabbit(c,ringPos(90)[0],ringPos(90)[1],1.2);
+    var angs=[-140,-40,40,140,180,0],p;
+    for(var i=0;i<angs.length;i++){p=ringPos(angs[i]);
+      c.fillStyle=i%2?'rgba(244,238,221,.9)':'rgba(255,217,138,.9)';
+      c.beginPath();c.arc(p[0],p[1],2.4,0,7);c.fill();}
+  },
+  /* 月饼：烘焙金 + 酥皮纹 */
+  mooncake:function(c){
+    var g=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    g.addColorStop(0,'#a86a28');g.addColorStop(1,'#63400f');
+    ringPath(c);c.fillStyle=g;c.fill();
+    edgeStroke(c,'rgba(255,232,178,.9)',4,3);
+    var p=ringPos(-90);mooncake(c,p[0],p[1],17);
+    p=ringPos(135);mooncake(c,p[0],p[1],13);
+    p=ringPos(45);mooncake(c,p[0],p[1],13);
+    var dots=[-135,-45,180,0,90];
+    for(var i=0;i<dots.length;i++){p=ringPos(dots[i]);
+      c.fillStyle='rgba(255,232,178,.85)';c.beginPath();c.arc(p[0],p[1],2.5,0,7);c.fill();}
+  },
+  /* 桂花：琥珀 + 金桂 */
+  guihua:function(c){
+    var g=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    g.addColorStop(0,'#8a5f1d');g.addColorStop(1,'#4a3006');
+    ringPath(c);c.fillStyle=g;c.fill();
+    edgeStroke(c,'rgba(255,217,138,.9)',4,3);
+    osCluster(c,-135);osCluster(c,-45);osCluster(c,135);osCluster(c,45);
+    var p=ringPos(-90);
+    c.fillStyle='#f8ecc9';c.beginPath();c.arc(p[0],p[1],10,0,7);c.fill();
+    var dots=[180,0,90,-90],i;
+    for(i=0;i<dots.length;i++){p=ringPos(dots[i]);
+      c.fillStyle='rgba(255,233,184,.85)';c.beginPath();c.arc(p[0],p[1],2.3,0,7);c.fill();}
+  },
+  /* 孔明灯：夜空放灯 */
+  kongming:function(c){
+    var g=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    g.addColorStop(0,'#0e2050');g.addColorStop(1,'#050a1c');
+    ringPath(c);c.fillStyle=g;c.fill();
+    edgeStroke(c,'rgba(243,211,131,.85)',4,3);
+    var p;p=ringPos(-150);skylantern(c,p[0],p[1],1);
+    p=ringPos(-105);skylantern(c,p[0],p[1],.75);
+    p=ringPos(-60);skylantern(c,p[0],p[1],.9);
+    p=ringPos(160);skylantern(c,p[0],p[1],.7);
+    p=ringPos(20);skylantern(c,p[0],p[1],.8);
+    var dots=[-130,-75,-30,0,55,90,120,185],i;
+    for(i=0;i<dots.length;i++){p=ringPos(dots[i]);
+      c.fillStyle='rgba(244,238,221,.85)';c.beginPath();c.arc(p[0],p[1],1.8,0,7);c.fill();}
+  },
+  /* 山河：日出金山 + 小国旗 */
+  shanhe:function(c){
+    var g=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    g.addColorStop(0,'#d8a844');g.addColorStop(1,'#8a5a1a');
+    ringPath(c);c.fillStyle=g;c.fill();
+    edgeStroke(c,'rgba(255,244,214,.9)',5,3);
+    var p=ringPos(-90);
+    var glow=c.createRadialGradient(p[0],p[1],4,p[0],p[1],34);
+    glow.addColorStop(0,'rgba(232,50,63,.55)');glow.addColorStop(1,'rgba(232,50,63,0)');
+    c.fillStyle=glow;c.beginPath();c.arc(p[0],p[1],34,0,7);c.fill();
+    c.fillStyle='#e8323f';c.beginPath();c.arc(p[0],p[1],14,0,7);c.fill();
+    p=ringPos(-135);mountain(c,p[0],p[1],1.4,'#1f4d3a','#eef5ea');
+    p=ringPos(-45);mountain(c,p[0],p[1],1.4,'#1f4d3a','#eef5ea');
+    p=ringPos(135);mountain(c,p[0],p[1],1.15,'#16324f','#dfe9f2');
+    p=ringPos(45);mountain(c,p[0],p[1],1.15,'#16324f','#dfe9f2');
+    var poleX=C+2,pyTop=C+R_MID-24,pyBase=C+R_MID+30;
+    c.strokeStyle='#fdf6e0';c.lineWidth=2.5;
+    c.beginPath();c.moveTo(poleX,pyTop);c.lineTo(poleX,pyBase);c.stroke();
+    c.fillStyle='#ffd94a';c.beginPath();c.arc(poleX,pyTop-3,3,0,7);c.fill();
+    drawFlag(c,poleX+1.5,pyTop,3);
+    var dots=[180,0],i;
+    for(i=0;i<dots.length;i++){p=ringPos(dots[i]);
+      c.fillStyle='rgba(255,244,214,.9)';c.beginPath();c.arc(p[0],p[1],2.5,0,7);c.fill();}
+  },
+  /* 灯笼：满环红灯笼 */
+  lantern:function(c){
+    var g=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    g.addColorStop(0,'#b01226');g.addColorStop(1,'#56060f');
+    ringPath(c);c.fillStyle=g;c.fill();
+    edgeStroke(c,'rgba(243,211,131,.95)',5,3);
+    var p;p=ringPos(-120);lantern(c,p[0],p[1],.95);
+    p=ringPos(-90);lantern(c,p[0],p[1],1.05);
+    p=ringPos(-60);lantern(c,p[0],p[1],.95);
+    p=ringPos(160);lantern(c,p[0],p[1],.85);
+    p=ringPos(20);lantern(c,p[0],p[1],.85);
+    var dots=[-150,-30,60,90,120,185],i;
+    for(i=0;i<dots.length;i++){p=ringPos(dots[i]);
+      c.fillStyle='rgba(255,217,74,.85)';c.beginPath();c.arc(p[0],p[1],2.4,0,7);c.fill();}
+  },
+  /* 烟花：多彩夜空 */
+  firework:function(c){
+    var g=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    g.addColorStop(0,'#101a3e');g.addColorStop(1,'#04071a');
+    ringPath(c);c.fillStyle=g;c.fill();
+    edgeStroke(c,'rgba(207,225,255,.7)',4,3);
+    var p;p=ringPos(-135);burst(c,p[0],p[1],24,'#ffd94a');
+    p=ringPos(-45);burst(c,p[0],p[1],24,'#ff7b8f');
+    p=ringPos(135);burst(c,p[0],p[1],24,'#8fc3ff');
+    p=ringPos(45);burst(c,p[0],p[1],24,'#c9a4ff');
+    var dots=[-160,-110,-20,10,70,110,160,185],i;
+    for(i=0;i<dots.length;i++){p=ringPos(dots[i]);
+      c.fillStyle=i%2?'rgba(244,238,221,.9)':'rgba(255,217,74,.9)';
+      c.beginPath();c.arc(p[0],p[1],2,0,7);c.fill();}
+  },
+  /* 祥云：鎏金如意 */
+  xiangyun:function(c){
+    var g=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    g.addColorStop(0,'#c9982e');g.addColorStop(1,'#6e4a0d');
+    ringPath(c);c.fillStyle=g;c.fill();
+    edgeStroke(c,'rgba(255,248,230,.9)',5,3);
+    var p;p=ringPos(-135);cloud(c,p[0],p[1],1.25,'#fff7e6');
+    p=ringPos(-45);cloud(c,p[0],p[1],1.25,'#fff7e6');
+    p=ringPos(135);cloud(c,p[0],p[1],1.25,'#fff7e6');
+    p=ringPos(45);cloud(c,p[0],p[1],1.25,'#fff7e6');
+    p=ringPos(-90);
+    c.save();c.translate(p[0],p[1]);c.rotate(Math.PI/4);
+    c.fillStyle='#e8323f';c.fillRect(-6.5,-6.5,13,13);
+    c.strokeStyle='#fff7e6';c.lineWidth=1.5;c.strokeRect(-6.5,-6.5,13,13);c.restore();
+    p=ringPos(90);
+    c.save();c.translate(p[0],p[1]);c.rotate(Math.PI/4);
+    c.fillStyle='#e8323f';c.fillRect(-6.5,-6.5,13,13);
+    c.strokeStyle='#fff7e6';c.lineWidth=1.5;c.strokeRect(-6.5,-6.5,13,13);c.restore();
+    var dots=[180,0,-113,-67,113,67],i;
+    for(i=0;i<dots.length;i++){p=ringPos(dots[i]);
+      c.fillStyle='rgba(163,13,36,.9)';c.beginPath();c.arc(p[0],p[1],2.6,0,7);c.fill();}
+  },
+  /* 月旗：左月兔右国旗 */
+  yueqi:function(c){
+    var gr=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    gr.addColorStop(0,'#e8323f');gr.addColorStop(1,'#9d0c22');
+    var gn=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    gn.addColorStop(0,'#1b3a78');gn.addColorStop(1,'#0a1838');
+    c.save();c.beginPath();c.rect(0,0,C,S);c.clip();ringPath(c);c.fillStyle=gn;c.fill();c.restore();
+    c.save();c.beginPath();c.rect(C,0,C,S);c.clip();ringPath(c);c.fillStyle=gr;c.fill();c.restore();
+    c.strokeStyle='rgba(243,211,131,.95)';c.lineWidth=4;
+    c.beginPath();c.moveTo(C,C-R_OUT);c.lineTo(C,C-R_IN);c.stroke();
+    c.beginPath();c.moveTo(C,C+R_IN);c.lineTo(C,C+R_OUT);c.stroke();
+    edgeStroke(c,'rgba(243,211,131,.95)',5,3);
+    moonAt(c,-143,20);
+    rabbit(c,ringPos(143)[0],ringPos(143)[1],.9);
+    var poleX=C-2,pyTop=C+R_MID-24,pyBase=C+R_MID+30;
+    c.strokeStyle='#f3d383';c.lineWidth=2.5;
+    c.beginPath();c.moveTo(poleX,pyTop);c.lineTo(poleX,pyBase);c.stroke();
+    c.fillStyle='#ffd94a';c.beginPath();c.arc(poleX,pyTop-3,3,0,7);c.fill();
+    drawFlag(c,poleX+1.5,pyTop,3);
+    var p,dots=[-180,-115,-64,12,64,152],i;
+    for(i=0;i<dots.length;i++){p=ringPos(dots[i]);
+      c.fillStyle=i%2?'rgba(255,217,74,.85)':'rgba(244,238,221,.85)';
+      c.beginPath();c.arc(p[0],p[1],2.4,0,7);c.fill();}
+    var tp=ringPos(-90);
+    c.save();c.translate(tp[0],tp[1]);c.rotate(Math.PI/4);
+    c.fillStyle='#f3d383';c.fillRect(-7,-7,14,14);c.restore();
+    var bp=ringPos(90);
+    c.save();c.translate(bp[0],bp[1]);c.rotate(Math.PI/4);
+    c.fillStyle='#f3d383';c.fillRect(-7,-7,14,14);c.restore();
+  },
+  /* 团圆：月圆灯暖 */
+  tuanyuan:function(c){
+    var g=c.createLinearGradient(0,C-R_OUT,0,C+R_OUT);
+    g.addColorStop(0,'#b3762c');g.addColorStop(1,'#6e4212');
+    ringPath(c);c.fillStyle=g;c.fill();
+    edgeStroke(c,'rgba(255,236,190,.95)',5,3);
+    moonAt(c,-90,22);
+    var p;p=ringPos(135);lantern(c,p[0],p[1],.9);
+    p=ringPos(45);lantern(c,p[0],p[1],.9);
+    flower(c,ringPos(-135)[0],ringPos(-135)[1],9,'#ffe9b8','#e8a33d');
+    flower(c,ringPos(-45)[0],ringPos(-45)[1],9,'#ffe9b8','#e8a33d');
+    var dots=[180,0,-113,-67,113,67,90],i;
+    for(i=0;i<dots.length;i++){p=ringPos(dots[i]);
+      c.fillStyle='rgba(255,236,190,.85)';c.beginPath();c.arc(p[0],p[1],2.4,0,7);c.fill();}
+  }
+};
+
+/* ─────────── 交互 ─────────── */
+dz.addEventListener('click',function(){fileInput.click();});
+fileInput.addEventListener('change',function(){loadFile(this.files[0]);this.value='';});
+['dragover','dragenter'].forEach(function(e){dz.addEventListener(e,function(ev){ev.preventDefault();dz.classList.add('drag');});});
+['dragleave','drop'].forEach(function(e){dz.addEventListener(e,function(ev){ev.preventDefault();dz.classList.remove('drag');});});
+dz.addEventListener('drop',function(ev){loadFile(ev.dataTransfer.files[0]);});
+
+document.getElementById('frames').addEventListener('click',function(ev){
+  var chip=ev.target.closest('.frame-chip');if(!chip)return;
+  document.querySelectorAll('#frames .frame-chip').forEach(function(x){x.classList.remove('sel');});
+  chip.classList.add('sel');frame=chip.dataset.f;render();
+});
+document.getElementById('styles').addEventListener('click',function(ev){
+  var chip=ev.target.closest('.frame-chip');if(!chip)return;
+  document.querySelectorAll('#styles .frame-chip').forEach(function(x){x.classList.remove('sel');});
+  chip.classList.add('sel');style=chip.dataset.s;
+  document.getElementById('frames').classList.toggle('disabled',style!=='ring');
+  render();
+});
+document.getElementById('zoom').addEventListener('input',function(){zoom=+this.value;render();});
+document.getElementById('btnChange').addEventListener('click',function(){fileInput.click();});
+
+/* 拖拽 / 双指缩放 */
+var ptrs=new Map(),lastDist=0,lastMid=null;
+function canvasXY(ev){var r=cv.getBoundingClientRect();return [(ev.clientX-r.left)*(S/r.width),(ev.clientY-r.top)*(S/r.height)];}
+cv.addEventListener('pointerdown',function(ev){if(!img)return;cv.setPointerCapture(ev.pointerId);ptrs.set(ev.pointerId,ev);});
+cv.addEventListener('pointermove',function(ev){
+  if(!img||!ptrs.has(ev.pointerId))return;
+  if(ptrs.size===1){
+    var p=canvasXY(ev),lp=ptrs.get(ev.pointerId),l=canvasXY(lp);
+    ox+=p[0]-l[0];oy+=p[1]-l[1];clampOff();render();ptrs.set(ev.pointerId,ev);
+  }else if(ptrs.size===2){
+    ptrs.set(ev.pointerId,ev);
+    var pts=[...ptrs.values()];
+    var a=canvasXY(pts[0]),b=canvasXY(pts[1]);
+    var d=Math.hypot(a[0]-b[0],a[1]-b[1]);
+    var mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+    if(lastDist){
+      var nz=Math.max(1,Math.min(3,zoom*d/lastDist));
+      ox=mid[0]-(mid[0]-ox)*nz/zoom;oy=mid[1]-(mid[1]-oy)*nz/zoom;
+      zoom=nz;document.getElementById('zoom').value=zoom;
+      clampOff();render();
+    }
+    lastDist=d;lastMid=mid;
+  }
+});
+function endPtr(ev){ptrs.delete(ev.pointerId);if(ptrs.size<2){lastDist=0;lastMid=null;}}
+cv.addEventListener('pointerup',endPtr);cv.addEventListener('pointercancel',endPtr);
+cv.addEventListener('wheel',function(ev){
+  if(!img)return;ev.preventDefault();
+  var nz=Math.max(1,Math.min(3,zoom*(ev.deltaY<0?1.07:0.93)));
+  var p=canvasXY(ev);
+  ox=p[0]-(p[0]-ox)*nz/zoom;oy=p[1]-(p[1]-oy)*nz/zoom;
+  zoom=nz;document.getElementById('zoom').value=zoom;clampOff();render();
+},{passive:false});
+
+/* 生成与弹层 */
+var modal=document.getElementById('modal'),resultImg=document.getElementById('resultImg'),btnDl=document.getElementById('btnDl');
+document.getElementById('btnGen').addEventListener('click',function(){
+  if(!img)return;
+  cv.toBlob(function(b){
+    var url=URL.createObjectURL(b);
+    resultImg.src=url;btnDl.href=url;
+    modal.classList.add('on');
+  },'image/png');
+});
+document.getElementById('btnAgain').addEventListener('click',function(){modal.classList.remove('on');});
+modal.addEventListener('click',function(ev){if(ev.target===modal)modal.classList.remove('on');});
+</script>
+</body>
+</html>
