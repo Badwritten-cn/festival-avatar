@@ -856,13 +856,24 @@ cv.addEventListener('wheel',function(ev){
 
 /* 生成与弹层 */
 var modal=document.getElementById('modal'),resultImg=document.getElementById('resultImg'),btnDl=document.getElementById('btnDl');
+var modalHint=document.querySelector('.modal-hint');
+/* 微信/QQ 内置浏览器不支持 a[download]，也不能保存 blob: 图片；
+   改用 data: URL（长按即可保存到相册） */
+var UA=navigator.userAgent;
+var IN_WECHAT=/MicroMessenger/i.test(UA);
+var IN_APP=/MicroMessenger|QQ\/|AlipayClient|DingTalk|Weibo/i.test(UA);
+if(IN_WECHAT){
+  btnDl.style.display='none';
+  modalHint.innerHTML='长按上方图片 → 保存到手机相册<br>保存后可在微信里直接设为头像<br><span style="font-size:.82em;opacity:.75">若长按无反应：点右上角 ··· 选择「在浏览器打开」</span>';
+}else if(IN_APP){
+  btnDl.style.display='none';
+  modalHint.innerHTML='长按上方图片 → 保存到手机相册';
+}
 document.getElementById('btnGen').addEventListener('click',function(){
   if(!img)return;
-  cv.toBlob(function(b){
-    var url=URL.createObjectURL(b);
-    resultImg.src=url;btnDl.href=url;
-    modal.classList.add('on');
-  },'image/png');
+  var data=cv.toDataURL('image/png');
+  resultImg.src=data;btnDl.href=data;
+  modal.classList.add('on');
 });
 document.getElementById('btnAgain').addEventListener('click',function(){modal.classList.remove('on');});
 modal.addEventListener('click',function(ev){if(ev.target===modal)modal.classList.remove('on');});
